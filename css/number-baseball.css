@@ -1,0 +1,249 @@
+/* ==== BODY & CONTAINER ==== */
+:root {
+  --fallback-svg: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'>\
+    <defs><linearGradient id='g' x1='0' x2='1'>\
+      <stop offset='0' stop-color='%2374ebd5'/><stop offset='1' stop-color='%239face6'/>\
+    </linearGradient></defs>\
+    <rect width='100%' height='100%' fill='url(%23g)'/>\
+    <g fill='none' stroke='%23ffffff' stroke-width='6' opacity='.5' transform='translate(400,300)'>\
+      <circle r='180'/><path d='M-160 -30 C -80 -80, 80 -80, 160 -30'/>\
+      <path d='M-160 30 C -80 80, 80 80, 160 30'/>\
+    </g><text x='50%' y='92%' fill='%23ffffff' font-size='28' text-anchor='middle' opacity='.7'>Number Baseball</text>\
+  </svg>");
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.30)),
+    url("../images/baseball.jpg"),
+    var(--fallback-svg);
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: center center, center center, center center;
+  background-attachment: fixed, fixed, fixed;
+  background-size: cover, cover, cover;
+  color: #2c3e50;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.55);
+  z-index: -1;
+}
+
+.container {
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 22px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+h1 {
+  color: #2980b9;
+  margin: 0 0 10px;
+  letter-spacing: .5px;
+}
+
+/* ==== INPUT & BUTTONS ==== */
+#input {
+  width: 150px;
+  padding: 10px;
+  font-size: 18px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  text-align: center;
+}
+
+button {
+  padding: 10px 14px;
+  margin-left: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: transform .15s, filter .2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+button:active {
+  transform: translateY(0);
+  filter: brightness(.98);
+}
+
+button[type="submit"] { background:#27ae60; color:#fff; }
+#hintBtn { background:#f39c12; color:#fff; }
+#newGame { background:#3498db; color:#fff; margin-top:12px; display:none; }
+
+/* ==== MESSAGE ==== */
+#message {
+  font-weight:700;
+  margin:12px 0;
+  font-size:18px;
+}
+
+/* ==== SCOREBOARD ==== */
+#scoreboard {
+  margin-top:20px;
+  padding:12px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  border-radius:10px;
+}
+
+/* ==== POPUP ==== */
+.popup {
+  position:fixed;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(.6);
+  padding:22px 30px;
+  font-size:28px;
+  font-weight:800;
+  color:#fff;
+  border-radius:14px;
+  z-index:2000;
+  opacity:0;
+  animation:pop 1.05s forwards;
+  text-shadow: 0 2px 0 rgba(0,0,0,.15);
+}
+.popup.strike { background:#27ae60; }
+.popup.ball { background:#e67e22; }
+.popup.out { background:#7f8c8d; }
+.popup.homerun { background:#8e44ad; font-size:36px; }
+
+@keyframes pop {
+  0%{opacity:0; transform:translate(-50%,-50%) scale(.5) rotate(-3deg)}
+  25%{opacity:1; transform:translate(-50%,-50%) scale(1.12)}
+  60%{transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0; transform:translate(-50%,-50%) scale(.6)}
+}
+
+/* ==== CONFETTI ==== */
+#effect { position:fixed; inset:0; pointer-events:none; }
+.confetti {
+  position:absolute;
+  width:10px; height:10px;
+  border-radius:50%;
+  animation:fall 2s linear forwards;
+}
+@keyframes fall {
+  to{ transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
+
+/* ==== MODALS ==== */
+.modal {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.modal-content {
+  width:320px;
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  text-align:center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  animation:fadeIn .25s ease;
+}
+.hint-desc { line-height:1.5; }
+.modal-actions { margin-top:12px; }
+.modal-actions button {
+  margin:0 6px;
+  padding:8px 12px;
+  border-radius:8px;
+}
+#hintUse { background:#27ae60; color:#fff; }
+#hintCancel, #welcomeStart { background:#3498db; color:#fff; }
+
+/* Shake khi lỗi/không đủ lượt */
+.shake { animation:shake .45s; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  75%{transform:translateX(8px)}
+}
+@keyframes fadeIn {
+  from{transform:scale(.9); opacity:0}
+  to{transform:scale(1); opacity:1}
+}
+
+/* ==== BẢNG LỊCH SỬ ==== */
+#logs table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  font-size: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Header */
+#logs th {
+  background: linear-gradient(135deg, #3498db, #5dade2);
+  color: #fff;
+  padding: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+}
+
+/* Body */
+#logs td {
+  padding: 10px;
+  text-align: center;
+  background: #fff;
+  border-bottom: 1px solid #ecf0f1;
+  transition: background 0.2s;
+}
+
+/* Hover row */
+#logs tr:hover td { background: #f2f8ff; }
+
+/* Xen kẽ màu */
+#logs tbody tr:nth-child(even) td { background: #f9fbfd; }
+
+/* Strike/Ball coloring */
+#logs td:nth-child(3) {
+  color: #27ae60;
+  font-weight: bold;
+}
+#logs td:nth-child(4) {
+  color: #e67e22;
+  font-weight: bold;
+}
+
+/* Out row */
+.out-row td {
+  color: #7f8c8d;
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ==== INPUT RUNG ==== */
+#input.shake {
+  animation: shakeInput 0.45s;
+  border-color: #e74c3c;
+}
+@keyframes shakeInput {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>⚾ 숫자 야구 게임</title>
+  <link rel="stylesheet" href="css/number-baseball.css" />
+</head>
+<body>
+  <div class="overlay"></div>
+
+  <div class="container">
+    <h1>⚾ 숫자 야구 게임</h1>
+    <p>1~9 사이의 서로 다른 숫자 4개를 맞춰보세요. (0은 사용하지 않음)</p>
+
+    <form id="form">
+      <input type="text" id="input" maxlength="4" autocomplete="off" placeholder="숫자 4개 입력" />
+      <button type="submit">✔ 확인</button>
+      <button type="button" id="hintBtn">💡 힌트</button>
+    </form>
+
+    <div id="status"><p id="message">도전 기회: 10번</p></div>
+
+    <div id="logs"></div>
+    <button id="newGame">🔄 새 게임</button>
+
+    <div id="scoreboard">
+      <h2>🏆 전적</h2>
+      <p>승리: <span id="wins">0</span> | 패배: <span id="losses">0</span></p>
+      <p>평균 승리 턴: <span id="avgTurns">0</span></p>
+      <p>최고 점수: <span id="bestScore">0</span></p>
+    </div>
+
+    <div id="effect"></div>
+  </div>
+
+  <!-- Welcome modal -->
+  <div id="welcomeModal" class="modal">
+    <div class="modal-content">
+      <h3>👋 환영합니다!</h3>
+      <p class="hint-desc">
+        숫자 야구 게임에 오신 것을 환영합니다.<br/>
+        1~9의 서로 다른 숫자 4개를 맞춰 보세요.
+      </p>
+      <div class="modal-actions">
+        <button id="welcomeStart">게임 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint modal -->
+<div id="hintModal" class="modal">
+  <div class="modal-content" id="hintBox">
+    <h3>💡 힌트</h3>
+    <p class="hint-desc">
+      힌트를 사용하시겠습니까?<br>
+      👉 정답의 <b>1자리 숫자와 위치</b>를 알려주며,<br>
+      <b>기회가 3번 차감</b>됩니다.
+    </p>
+    <div class="modal-actions">
+      <button id="hintUse">사용</button>
+      <button id="hintCancel">취소</button>
+      <button id="hintClose" style="display:none">확인</button>
+    </div>
+    <p id="hintResult"></p>
+  </div>
+</div>
+
+
+  <!-- (Tùy chọn) âm thanh từ thư mục sounds/ -->
+  <audio id="sound-strike"  src="sounds/strike.mp3"  preload="auto"></audio>
+  <audio id="sound-ball"    src="sounds/ball.mp3"    preload="auto"></audio>
+  <audio id="sound-out"     src="sounds/out.mp3"     preload="auto"></audio>
+  <audio id="sound-homerun" src="sounds/homerun.mp3" preload="auto"></audio>
+  <audio id="sound-hint"    src="sounds/hint.mp3"    preload="auto"></audio>
+
+  <script src="js/number-baseball.js"></script>
+</body>
+</html>
