@@ -1,77 +1,157 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>⚾ 숫자 야구 게임</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Number Baseball</title>
   <link rel="stylesheet" href="css/number-baseball.css" />
 </head>
 <body>
   <div class="overlay"></div>
 
-  <div class="container">
-    <h1>⚾ 숫자 야구 게임</h1>
-    <p>1~9 사이의 서로 다른 숫자 4개를 맞춰보세요. (0은 사용하지 않음)</p>
+  <!-- Topbar -->
+  <header class="topbar" role="banner">
+    <h1 id="title" data-i18n="title">숫자 야구</h1>
 
-    <form id="form">
-      <input type="text" id="input" maxlength="4" autocomplete="off" placeholder="숫자 4개 입력" />
-      <button type="submit">✔ 확인</button>
-      <button type="button" id="hintBtn">💡 힌트</button>
+    <div class="controls">
+      <!-- Difficulty -->
+      <label class="control">
+        <span class="sr-only">Difficulty</span>
+        <select id="difficulty" aria-label="Difficulty">
+          <option value="easy">Easy</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Hard</option>
+        </select>
+      </label>
+
+      <!-- i18n -->
+      <label class="control">
+        <span class="sr-only">Language</span>
+        <select id="langSelect" aria-label="Language">
+          <option value="ko">한국어</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+
+      <!-- theme -->
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Theme">🌓</button>
+
+      <!-- sound -->
+      <button id="muteToggle" class="icon-btn" aria-pressed="false" aria-label="Mute" title="Mute/Unmute">🔊</button>
+      <input id="volume" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume" />
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <!-- Scoreboard -->
+    <section id="scoreboard" class="cards" aria-label="Scoreboard">
+      <div class="card">
+        <div class="card-label" data-i18n="wins">승리</div>
+        <div class="card-value" id="wins">0</div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="losses">패배</div>
+        <div class="card-value" id="losses">0</div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="avg">평균 시도</div>
+        <div class="card-value" id="avgTurns">0</div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="best">최고 점수</div>
+        <div class="card-value" id="bestScore">0</div>
+      </div>
+      <button id="resetStats" class="pill" data-i18n="resetStats" aria-label="Reset stats">전적 초기화</button>
+    </section>
+
+    <!-- Progress ring + message -->
+    <section class="progress-wrap">
+      <svg id="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="54" class="ring-bg"></circle>
+        <circle cx="60" cy="60" r="54" class="ring-fg" id="ringFg"></circle>
+        <text x="60" y="66" text-anchor="middle" class="ring-text" id="ringText">10</text>
+      </svg>
+      <div id="message" class="message" aria-live="polite">도전 기회: 10번</div>
+    </section>
+
+    <!-- Input -->
+    <form id="form" autocomplete="off" aria-label="Guess form">
+      <label class="sr-only" for="input" data-i18n="enter4">4자리 숫자 입력</label>
+      <input id="input" maxlength="4" inputmode="numeric" pattern="[1-9]*" />
+      <button id="submit" class="primary" type="submit" data-i18n="submit">제출</button>
+      <button id="hintBtn" type="button" class="accent" data-i18n="hint">힌트</button>
+      <button id="newGame" type="button" class="ghost" data-i18n="newGame" style="display:none">새 게임</button>
     </form>
 
-    <div id="status"><p id="message">도전 기회: 10번</p></div>
+    <!-- Logs -->
+    <section id="logs" aria-label="History">
+      <table aria-describedby="tableCaption">
+        <caption id="tableCaption" data-i18n="history">기록</caption>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th data-i18n="input">입력</th>
+            <th data-i18n="strike">스트라이크</th>
+            <th data-i18n="ball">볼</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <!-- mobile cards container -->
+      <div id="logCards" class="log-cards"></div>
+    </section>
+  </main>
 
-    <div id="logs"></div>
-    <button id="newGame">🔄 새 게임</button>
+  <!-- Effects layer -->
+  <div id="effect" aria-hidden="true"></div>
 
-    <div id="scoreboard">
-      <h2>🏆 전적</h2>
-      <p>승리: <span id="wins">0</span> | 패배: <span id="losses">0</span></p>
-      <p>평균 승리 턴: <span id="avgTurns">0</span></p>
-      <p>최고 점수: <span id="bestScore">0</span></p>
+  <!-- Welcome Modal -->
+  <div id="welcomeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal-content" id="welcomeBox">
+      <h2 id="welcomeTitle" data-i18n="welcomeTitle">숫자 야구에 오신 것을 환영합니다!</h2>
+      <p data-i18n="welcomeDesc">1~9 사이의 중복 없는 4자리 숫자를 맞춰보세요.</p>
+      <button id="welcomeStart" class="primary" data-i18n="start">게임 시작</button>
     </div>
-
-    <div id="effect"></div>
   </div>
 
-  <!-- Welcome modal -->
-  <div id="welcomeModal" class="modal">
-    <div class="modal-content">
-      <h3>👋 환영합니다!</h3>
-      <p class="hint-desc">
-        숫자 야구 게임에 오신 것을 환영합니다.<br/>
-        1~9의 서로 다른 숫자 4개를 맞춰 보세요.
-      </p>
+  <!-- Hint Modal (multi-option) -->
+  <div id="hintModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="hintTitle" style="display:none">
+    <div class="modal-content" id="hintBox">
+      <h3 id="hintTitle">💡 <span data-i18n="hintTitle">힌트</span></h3>
+
+      <div class="hint-options" role="radiogroup" aria-label="Hint options" style="text-align:left; margin:8px 0;">
+        <label style="display:block; margin-bottom:6px;">
+          <input type="radio" name="hintOpt" value="reveal_pos" checked />
+          <span data-i18n="opt_reveal_pos">정답 자리 1개 공개 (−3)</span>
+        </label>
+        <label style="display:block; margin-bottom:6px;">
+          <input type="radio" name="hintOpt" value="existence" />
+          <span data-i18n="opt_existence">숫자 존재 여부 확인 (−1)</span>
+          <input id="existDigit" type="text" inputmode="numeric" pattern="[1-9]*" maxlength="1" style="width:48px; margin-left:8px;" aria-label="Digit to check" />
+        </label>
+        <label style="display:block;">
+          <input type="radio" name="hintOpt" value="exclude_two" />
+          <span data-i18n="opt_exclude_two">존재하지 않는 숫자 2개 알려주기 (−2)</span>
+        </label>
+      </div>
+
+      <p class="hint-desc"><span data-i18n="hintRule">정답의 1자리와 위치를 알려주며 기회 3회가 차감됩니다.</span></p>
+      <p id="hintResult"></p>
+
       <div class="modal-actions">
-        <button id="welcomeStart">게임 시작</button>
+        <button id="hintUse" class="primary" data-i18n="use">사용</button>
+        <button id="hintCancel" class="ghost" data-i18n="cancel">취소</button>
+        <button id="hintClose" class="accent" style="display:none" data-i18n="ok">확인</button>
       </div>
     </div>
   </div>
 
-  <!-- Hint modal -->
-<div id="hintModal" class="modal">
-  <div class="modal-content" id="hintBox">
-    <h3>💡 힌트</h3>
-    <p class="hint-desc">
-      힌트를 사용하시겠습니까?<br>
-      👉 정답의 <b>1자리 숫자와 위치</b>를 알려주며,<br>
-      <b>기회가 3번 차감</b>됩니다.
-    </p>
-    <div class="modal-actions">
-      <button id="hintUse">사용</button>
-      <button id="hintCancel">취소</button>
-      <button id="hintClose" style="display:none">확인</button>
-    </div>
-    <p id="hintResult"></p>
-  </div>
-</div>
-
-
-  <!-- (Tùy chọn) âm thanh từ thư mục sounds/ -->
-  <audio id="sound-strike"  src="sounds/strike.mp3"  preload="auto"></audio>
-  <audio id="sound-ball"    src="sounds/ball.mp3"    preload="auto"></audio>
-  <audio id="sound-out"     src="sounds/out.mp3"     preload="auto"></audio>
-  <audio id="sound-homerun" src="sounds/homerun.mp3" preload="auto"></audio>
-  <audio id="sound-hint"    src="sounds/hint.mp3"    preload="auto"></audio>
+  <!-- AUDIO -->
+  <audio id="sound-strike" src="sounds/strike.mp3" preload="auto"></audio>
+  <audio id="sound-ball"   src="sounds/ball.mp3"   preload="auto"></audio>
+  <audio id="sound-out"    src="sounds/out.mp3"    preload="auto"></audio>
+  <audio id="sound-homerun"src="sounds/homerun.mp3"preload="auto"></audio>
+  <audio id="sound-hint"   src="sounds/hint.mp3"   preload="auto"></audio>
 
   <script src="js/number-baseball.js"></script>
 </body>
